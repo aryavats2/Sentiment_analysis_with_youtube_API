@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sentiment Analysis</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex justify-center items-center min-h-screen">
+  <div class="max-w-2xl w-full bg-white p-6 rounded-lg shadow-lg">
+    <h1 class="text-3xl font-bold text-center text-gray-800">Sentiment Analysis</h1>
+    
+    <!-- Text Sentiment Analysis -->
+    <div class="mt-6">
+      <h2 class="text-xl font-semibold text-gray-700">Text Sentiment Analysis</h2>
+      <textarea id="textInput" class="w-full p-3 mt-2 border rounded-lg focus:ring-2 focus:ring-blue-400" rows="4" placeholder="Type your text here..."></textarea>
+      <button onclick="predictSentiment()" class="mt-3 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">Predict Sentiment</button>
+      <div id="textResponse" class="mt-3 p-3 bg-gray-100 rounded-lg"></div>
+    </div>
+
+    <!-- YouTube Comment Analysis -->
+    <div class="mt-8">
+      <h2 class="text-xl font-semibold text-gray-700">YouTube Comment Sentiment Analysis</h2>
+      <input type="text" id="videoId" class="w-full p-3 mt-2 border rounded-lg focus:ring-2 focus:ring-blue-400" placeholder="Enter YouTube Video ID">
+      <button onclick="analyzeYouTube()" class="mt-3 w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">Analyze Comments</button>
+      <div id="youtubeResponse" class="mt-3 p-3 bg-gray-100 rounded-lg"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "http://127.0.0.1:8000"; 
+
+    async function predictSentiment() {
+      const text = document.getElementById("textInput").value;
+      if (!text) return alert("Please enter some text.");
+      
+      try {
+        const response = await fetch(`${API_BASE}/predict`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text })
+        });
+        const result = await response.json();
+        document.getElementById("textResponse").innerHTML = `<pre class="text-sm text-gray-700">${JSON.stringify(result, null, 2)}</pre>`;
+      } catch (error) {
+        console.error("Error:", error);
+        document.getElementById("textResponse").innerText = "An error occurred.";
+      }
+    }
+
+    async function analyzeYouTube() {
+      const videoId = document.getElementById("videoId").value;
+      if (!videoId) return alert("Please enter a YouTube video ID.");
+      
+      try {
+        const response = await fetch(`${API_BASE}/youtube/${videoId}`);
+        const result = await response.json();
+        document.getElementById("youtubeResponse").innerHTML = `<pre class="text-sm text-gray-700">${JSON.stringify(result, null, 2)}</pre>`;
+      } catch (error) {
+        console.error("Error:", error);
+        document.getElementById("youtubeResponse").innerText = "An error occurred.";
+      }
+    }
+  </script>
+</body>
+</html>
